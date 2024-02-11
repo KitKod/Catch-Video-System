@@ -1,29 +1,40 @@
+import io
 import json
 import os
 import socket
-import cv2
-import numpy as np
-import torch
+
+from PIL import Image
+from ultralytics import YOLO
 
 
-def detect_drones(image_bytes, model):
-    # Convert image bytes to a NumPy array and process
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img_tensor = torch.tensor(img_rgb).float().permute(2, 0, 1).unsqueeze(0) / 255.0
+def detect_drones(image, model):
+    final_result = {
+        "xmin": None,
+        "ymin": None,
+        "xmax": None,
+        "ymax": None,
+        "conf": 0.0,
+    }
 
-    with torch.no_grad():
-        results = model(img_tensor)
+    pred_results = model([image])
 
-    boxes = results.xyxy[0]
-    drones_coords = [
-        [box[0].item(), box[1].item(), box[2].item(), box[3].item()]
-        for box in boxes
-        if box[-1] == 0
-    ]
+    drones_coords = pred_results[0].boxes.xyxy
+    conf = pred_results[0].boxes.conf
 
-    return drones_coords
+    xmin, ymin, xmax, ymax = drones_coords[0].tolist()
+    confidence = conf.item()
+
+    print(
+        f"Coordinates: xmin={xmin}, ymin={ymin}, xmax={xmax}, ymax={ymax}, Confidence: {confidence}"
+    )
+
+    final_result["xmin"] = xmin
+    final_result["ymin"] = ymin
+    final_result["xmax"] = xmax
+    final_result["ymax"] = ymax
+    final_result["conf"] = confidence
+
+    return final_result
 
 
 def main():
@@ -34,18 +45,12 @@ def main():
         print("Could not determine the script's directory; '__file__' is undefined.")
         return
 
-    # Path to the model file within the project structure
     model_path = os.path.join(project_root, "models", "15_10_23_colab_v1_best.pt")
-    model = torch.load(model_path, map_location=torch.device("cpu"))
-    model.eval()
+    model = YOLO(model_path)
 
-    # Unix socket setup
     socket_path = "/tmp/catch_video_system_v1_unix_socket"
-    try:
+    if os.path.exists(socket_path):
         os.unlink(socket_path)
-    except OSError:
-        if os.path.exists(socket_path):
-            raise
 
     server_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     server_socket.bind(socket_path)
@@ -55,17 +60,28 @@ def main():
     while True:
         connection, _ = server_socket.accept()
         try:
+            # First, read the size of the image data
+            header = connection.recv(64)
+            if not header:
+                print("No header received")
+                continue
+            data_size = int(header.decode("utf-8").strip())
             image_data = b""
-            while True:
+
+            # Then, read the image data
+            while len(image_data) < data_size:
                 packet = connection.recv(4096)
                 if not packet:
                     break
                 image_data += packet
 
             if image_data:
-                coords = detect_drones(image_data, model)
+                print("Image data was received. Start processing...")
+                image = Image.open(io.BytesIO(image_data))
+                coords = detect_drones(image, model)
                 response = json.dumps(coords)
                 connection.sendall(response.encode("utf-8"))
+                print("Image was processed successfully. Listening for next one...")
         finally:
             connection.close()
 

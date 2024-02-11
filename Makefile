@@ -16,6 +16,10 @@ $(VENV_NAME)/bin/activate: requirements.txt
 	${PIP} install -r requirements.txt
 	touch $(VENV_NAME)/bin/activate
 
+# Reinstall dependencies from requirements.txt
+reinstall-dependencies: $(VENV_NAME)/bin/activate
+	${PIP} install --force-reinstall -r requirements.txt
+
 # Run your application
 client: venv
 	$(PYTHON) client.py
@@ -32,13 +36,13 @@ clean:
 	find . -type f -name '*.pyc' -delete
 	find . -type d -name '__pycache__' -exec rm -rf {} +
 
-# Help
 help:
 	@echo "Makefile for managing the Python project"
 	@echo ""
 	@echo "Commands:"
-	@echo "venv    Create a virtual environment and install dependencies"
-	@echo "run     Run the application"
-	@echo "serve   Serve the application (if applicable)"
-	@echo "stop    Stop the application (modify as needed)"
-	@echo "clean   Remove the virtual environment and cleanup files"
+	@echo "venv                   Create a virtual environment and install dependencies"
+	@echo "reinstall-dependencies Reinstall all dependencies from requirements.txt"
+	@echo "client                 Run the client application"
+	@echo "server                 Run the server application"
+	@echo "stop                   Stop the application (modify as needed)"
+	@echo "clean                  Remove the virtual environment and cleanup files"
