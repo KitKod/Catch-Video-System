@@ -17,15 +17,12 @@ $(VENV_NAME)/bin/activate: requirements.txt
 	touch $(VENV_NAME)/bin/activate
 
 # Run your application
-run: venv
-	$(PYTHON) your_application.py
+client: venv
+	$(PYTHON) client.py
 
-# Example command to run your application in a different way
-# For instance, starting a web server, etc.
-serve: venv
-	$(PYTHON) your_server.py
+server: venv
+	$(PYTHON) app.py
 
-# Stop application (Modify as needed; this is just a placeholder)
 stop:
 	@echo "Stopping application..." # Implement actual stop command
 
