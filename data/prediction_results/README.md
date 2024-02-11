@@ -1,0 +1,1 @@
+We store result of prediction in this folder, but we will not save them in GitHub

@@ -1,3 +1,4 @@
 # created by virtualenv automatically
 .idea/
 .DS_Store
+data/prediction_results/*.jpg

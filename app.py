@@ -2,6 +2,7 @@ import io
 import json
 import os
 import socket
+from datetime import datetime
 
 from PIL import Image
 from ultralytics import YOLO
@@ -33,6 +34,12 @@ def detect_drones(image, model):
     final_result["xmax"] = xmax
     final_result["ymax"] = ymax
     final_result["conf"] = confidence
+
+    im_array = pred_results[0].plot()  # plot a BGR numpy array of predictions
+    im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_name = f"data/prediction_results/results-{timestamp}.jpg"
+    im.save(file_name)
 
     return final_result
 
