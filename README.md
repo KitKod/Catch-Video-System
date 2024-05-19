@@ -75,11 +75,14 @@ Based on URL: https://wiki.seeedstudio.com/J101_Enable_SD_Card/:
 	3) cd CSI-Camera
 	4) Перевірка скриптів
 
-#6 Setup main lib for CSI cameras that we will use in the app:
+#6 Setup python and libs:
 	1) Install GTK models: sudo apt-get install libcanberra-gtk-module libcanberra-gtk3-module
-	2) Install PIP: sudo apt install python3-pip
-	3) Install the lib (OR use requirements.txt): pip install nanocamera 
-	4) To check use scripts in ./sandbox/
+	2) Install python 3.8:  `sudo apt install python3.8`
+	3) Install venv and pip: `sudo apt install python3.8-venv & sudo apt-get install python3.8-dev`
+	4) Switch to use python 3.8: ```sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 & sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 2 & sudo update-alternatives --config python3```
+	5) Install PIP: `sudo apt install python3-pip`
+	6) Install the lib (OR use requirements.txt): pip install nanocamera 
+	7) To check use scripts in ./sandbox/
 
 
 
