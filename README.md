@@ -252,3 +252,9 @@ We need it to be able use cv2 in python3.8:
    ```bash
    python3.8 ./sandbox/usb_camera_simple_test_v1.py
    ```
+   If script above raises `ModuleNotFoundError: No module named 'cv2'` error, add following lines at the top of the script
+   ```
+   import sys
+   sys.path.append('/usr/lib/python3.8/site-packages')
+   print(sys.path
+   ```

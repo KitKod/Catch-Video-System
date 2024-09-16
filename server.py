@@ -1,3 +1,7 @@
+import sys
+sys.path.append('/usr/lib/python3.8/site-packages')
+print(sys.path)
+
 import io
 import json
 import os
@@ -22,8 +26,12 @@ def detect_drones(image, model):
     drones_coords = pred_results[0].boxes.xyxy
     conf = pred_results[0].boxes.conf
 
-    xmin, ymin, xmax, ymax = drones_coords[0].tolist()
-    confidence = conf.item()
+    if drones_coords is not None and len(drones_coords) > 0:
+        xmin, ymin, xmax, ymax = drones_coords[0].tolist()
+        confidence = conf.item()
+    else:
+        xmin, ymin, xmax, ymax = 0, 0, 0, 0
+        confidence = 0
 
     print(
         f"Coordinates: xmin={xmin}, ymin={ymin}, xmax={xmax}, ymax={ymax}, Confidence: {confidence}"
