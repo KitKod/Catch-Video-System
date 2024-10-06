@@ -258,3 +258,5 @@ We need it to be able use cv2 in python3.8:
    sys.path.append('/usr/lib/python3.8/site-packages')
    print(sys.path
    ```
+
+9. TODO: Install PyTourh with CUDA support
